@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<div>
+  <button class="saveAll">SAVEALL</button>
+</div>
+<div>
+  <input type="text" name="title" placeholder="Todo">
+  <button class="saveBtn">Save</button>
+</div>
+<ul class="todoList"></ul>
+<body>
+
+<script>
+  const renderTodos = () => {
+    const listUL = document.querySelector('.todoList')
+    let str=''
+    for (let i =0; i < arr.length; i++){
+      const {tno, title} = arr[i]
+      str += `<li data-tno="${tno}">${title} <button data-tno="${tno}">DEL</button></li>`
+    }
+    listUL.innerHTML = str
+  }
+  const todoService = (function(){
+    let sequence  = 1
+    let arr = []
+    const add = (newTodo) => {
+      newTodo.tno = sequence ++ ;
+      arr.push(newTodo)
+      renderTodos(arr)
+    }
+
+    const read = (tno) => {
+
+    }
+    const remove = (tno) => {
+      arr.filter(todo => todo.tno !== parseInt(tno))
+      arr = result;
+      renderTodos(arr)
+    }
+    const save = () => {
+      const str = JSON.stringify(arr)
+      localStorage.setItem('todos',str);
+    }
+    const loadArr = () => {
+      const dataStr = localStorage.getItem('todos')
+
+      if(dataStr){
+        arr =JSON.parse(dataStr)
+        renderTodos(arr)
+      }else{
+        arr = []
+      }
+    }
+    return {add, read,remove,save,loadArr}
+  })()
+
+  document.querySelector('.saveBtn').addEventListener('click',() => {
+    const value = document.querySelector("input[name='title']").value
+    todoService.add({title:value, complete:false})
+
+  document.querySelector('.todoList').addEventListener('click', (e) => {
+      const target = e.target;
+      if(target.tagName !== 'BUTTON'){
+        reuturn
+      }
+      const tno = target.getAttribute('data-tno')
+      alert(tno)
+      console.log(tno)
+      todoService.remove(tno)
+    },false)
+
+  document.querySelector('.saveAll').addEventListener('click', ()=>{
+    if(confirm("저장하시겠습니까?")){
+      todoService.save()
+    }
+  },false)
+
+  })
+
+</script>
+</body>
+</html>

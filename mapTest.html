@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>지도 생성하기</title>
+
+</head>
+<body>
+<!-- 지도를 표시할 div 입니다 -->
+<style>
+  .map{
+    width:100vw;
+    height:50vh;
+  }
+</style>
+<div id="map" class="map"></div>
+<div>
+  <button class="delBtn">DEL</button>
+</div>
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4b7709b975e6ddf36fbd0887994416d6"></script>
+<script>
+  const mapContainer = document.getElementById('map'), // 지도를 표시할 div
+    mapOption = {
+      center: new kakao.maps.LatLng(35.6312698, 129.3287257), // 지도의 중심좌표
+      level: 3 // 지도의 확대 레벨
+    };
+
+  // 지도를 표시할 div와  지도 옵션으로  지도를 생성합니다
+  const map = new kakao.maps.Map(mapContainer, mapOption);
+</script>
+<script>
+  var markerPosition  = new kakao.maps.LatLng(35.6312698, 129.3287257);
+
+  // 마커를 생성합니다
+  var marker = new kakao.maps.Marker({
+    position: markerPosition
+  });
+
+  kakao.maps.event.addListener(marker, 'mouseover', function() {
+    console.log("mouseover....")
+  });
+
+  // 마커에 마우스아웃 이벤트를 등록합니다
+  kakao.maps.event.addListener(marker, 'mouseout', function() {
+    console.log("mouseout....")
+  });
+
+    document.querySelector(".delBtn").addEventListener("click",()=>{
+      marker.setMap(null)
+    },false)
+
+  //marker.setMap(map)
+</script>
+<script></script>
+</body>
+</html>

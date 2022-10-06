@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    display: flex;
+  }
+
+  .menuDiv {
+    width: 60vw;
+    background-color: #25cff2;
+  }
+  .orderDiv {
+    width:40vw;
+    background-color: #ffcd39;
+  }
+
+  .menuDiv {
+    height: 100vh;
+  }
+  .menuDiv ul {
+    display: flex;
+    flex-wrap: wrap ;
+    list-style: none;
+  }
+
+  .menuDiv ul li {
+    border: 1px solid green;
+    margin: 0.5em;
+    border-radius: 10px;
+  }
+
+  .qtyBtn {
+    width: 50px;
+  }
+
+</style>
+
+<div class="menuDiv">
+  <ul>
+
+  </ul>
+</div>
+
+<div class="orderDiv">
+  <ul>
+
+  </ul>
+
+  <hr/>
+  <b id="total"></b>
+
+</div>
+
+<script>
+  const renderMenus = (arr) =>{
+    let str =''
+    for (let i = 0; i < arr.length ; i++) {
+      const {mno,mname,price,img} = arr[i]
+      str += `<li data-mno="${mno}" data-mname="${mname}" data-price="${price}">
+                  <div>
+                    <img src="img/${img}">
+                  </div>
+                  <div>
+                    <b>${mname} - ${price}</b>
+                  </div>
+                </li>`
+    }
+    document.querySelector(".menuDiv ul").innerHTML = str
+
+  }
+
+  const renderItems = (items) => {
+
+    let total = 0
+    let str =''
+    for (let i = 0; i < items.length ; i++) {
+      const {mno,mname,price,qty} = items[i]
+
+      total += price * qty
+      str += `<li data-mno="${mno}" data-mname="${mname}" data-price="${price}">
+                  <div>
+                    <b>${mname} - ${price} - ${qty}</b>
+                    <button data-mno="${mno}" class="qtyBtn plus">+</button>
+                    <button data-mno="${mno}" class="qtyBtn minus">-</button>
+                  </div>
+                </li>`
+    }
+    document.querySelector(".orderDiv ul").innerHTML = str
+    document.querySelector("#total").innerHTML = total
+  }
+
+  const cart = (function(){
+
+    let items = []
+
+    const add = (mno,mname,price) => {
+      //items에 해당 번호의 주문이 있는지 확인
+      const item = items.find( ele => ele.mno === mno)
+
+      console.log("find result", item)
+
+      //있다면 qty(수량)만 변경
+      if(item){
+        item.qty += 1
+      }else{
+        //없다면 새로 추가
+        items.push({ mno:mno, mname: mname, price:price, qty:1})
+
+      }
+
+      console.log(items)
+      renderItems(items)
+
+    }
+
+    const changeQty = (mno,amount) => {
+      const item = items.find( ele => ele.mno === mno)
+
+      item.qty += amount
+
+      if(item.qty <= 0){
+        items = items.filter(ele => ele.mno != mno)
+      }
+      renderItems(items)
+    }
+
+    return {add, changeQty}
+
+  })()
+
+
+
+  const menuService = (function(){
+
+    const menus = [
+      {mno:1, mname:'버거1', price: 5000, img: 'b1.png'},
+      {mno:2, mname:'버거2', price: 6000, img: 'b2.png'},
+      {mno:3, mname:'버거3', price: 7000, img: 'b3.png'},
+      {mno:4, mname:'버거4', price: 8000, img: 'b4.png'},
+      {mno:5, mname:'버거5', price: 9000, img: 'b5.png'},
+    ]
+
+    const showMenus = () => {
+      renderMenus(menus)
+    }
+
+    return {showMenus}
+
+  })()
+
+  menuService.showMenus()
+
+  document.querySelector('.menuDiv ul').addEventListener("click", (e)=> {
+
+    console.log("------------------" , e.target.tagName)
+
+    const target = e.target
+    if(target.tagName !== 'IMG'){
+      return
+    }
+
+    const liTarget = target.closest("li")
+
+    const mno = liTarget.getAttribute("data-mno")
+    const mname = liTarget.getAttribute("data-mname")
+    const price = liTarget.getAttribute("data-price")
+
+    console.log(mno, mname, price)
+    cart.add(mno,mname,price)
+
+  },false)
+
+  document.querySelector('.orderDiv ul').addEventListener("click", (e)=> {
+
+    const target = e.target
+
+    //className
+    //console.dir(target)
+
+    if(target.tagName !== 'BUTTON'){
+      return
+    }
+
+    const oper = target.className.split(" ")[1]
+    console.log(oper)
+    const mno = target.getAttribute("data-mno")
+    console.log(mno)
+    console.log("-----------------")
+
+    if(oper === 'plus'){
+      cart.changeQty(mno,1)
+    }else if(oper === 'minus'){
+      cart.changeQty(mno, -1)
+    }
+
+
+
+  },false)
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+

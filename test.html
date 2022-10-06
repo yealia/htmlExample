@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<div>
+  <button class="saveAll">SAVEALL</button>
+</div>
+<div>
+  <input type="text" name="title" placeholder="Todo">
+  <button class="saveBtn">Save</button>
+</div>
+<ul class="todoList"></ul>
+<script>
+  // const todoService = (function() {
+  //     let sequence = 1
+  //
+  //     const inc = () => {
+  //         ++sequence
+  //         console.log('sequence', sequence)
+  //     }
+  //
+  //     return inc
+  // })();
+
+  const renderTodos = (arr) => {
+    const listUL = document.querySelector('.todoList')
+
+    let str = ''
+
+    for(let i = 0; i < arr.length; i++){
+
+      const {tno, title, complete} = arr[i]
+      str += `<li data-tno="${tno}">${title} <button data-tno="${tno}">DEL</button> </li>`
+    }
+
+    listUL.innerHTML = str
+  }
+
+  //
+  const todoService = (function() {
+    let sequence = 1
+    let arr = []
+    const add = (newTodo) => {
+      newTodo.tno = sequence++;
+      arr.push(newTodo)
+      renderTodos(arr)
+    }
+    const read = (tno) => {
+
+    }
+    const remove = (tno) => {
+      const result = arr.filter(todo => todo.tno !== parseInt(tno))
+      arr = result;
+
+      console.log(arr)
+      renderTodos(arr);
+    }
+    const save = () => {
+      const str = JSON.stringify(arr)
+      localStorage.setItem('todos', str);
+    }
+    const loadArr = () => {
+      const dataStr = localStorage.getItem('todos')
+
+      if(dataStr){
+        arr = JSON.parse(dataStr)
+        renderTodos(arr)
+      }else{
+        arr = []
+      }
+    }
+
+    //리턴을 객체 리터럴로 한다
+    // return {add:add, read:read} 실제로는 이런 형태를 줄여서 사용
+    return {add, read, remove, save, loadArr}
+
+  })()
+
+  //다른곳에서 사용하지 않는 함수이기 때문에 오염시키지 않게 하기 위해서 외부함수로 선언하지 않는다.
+  document.querySelector('.saveBtn').addEventListener('click', () => {
+    const value = document.querySelector("input[name='title']").value
+
+    // console.log('value : ', value);
+
+    todoService.add({title:value,complete:false})
+
+    document.querySelector("input[name='title']").value = ''
+  }, false)
+
+  document.querySelector('.todoList').addEventListener('click', (e) => {
+    const target = e.target;
+
+    if(target.tagName !== 'BUTTON'){
+      return
+    }
+
+    const tno = target.getAttribute('data-tno')
+
+    alert(tno)
+
+    todoService.remove(tno)
+  }, false);
+
+  document.querySelector('.saveAll').addEventListener('click', () => {
+    if(confirm("저장하시겠습니까?")){
+      todoService.save()
+    }
+  }, false)
+
+  // 더미 데이터
+  // todoService.add({title:'AAA', complete:false})
+  // todoService.add({title:'AAB', complete:false})
+  // todoService.add({title:'AAC', complete:false})
+  // todoService.add({title:'AAD', complete:false})
+
+  todoService.loadArr()
+
+</script>
+</body>
+</html>

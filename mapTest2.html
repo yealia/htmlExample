@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>지도 생성하기</title>
+
+</head>
+<body>
+<!-- 지도를 표시할 div 입니다 -->
+<style>
+  .map {
+    width:100vw;
+    height: 40vh;
+  }
+</style>
+<div id="map" class="map"></div>
+
+<style>
+  .container {
+    display: flex;
+  }
+  .stores {
+    background-color: #ffcd39;
+    width: 50vw;
+    height: 100vh;
+  }
+  .detail {
+    background-color: lightcoral;
+    width: 50vw;
+    height: 100vh;
+  }
+</style>
+
+<div class="container">
+  <div class="stores">
+    <ul>
+
+    </ul>
+  </div>
+  <div class="detail">
+
+  </div>
+</div>
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=f7071bd17341e196ccaf18fbdbb8f86f"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  const mapContainer = document.getElementById('map'), // 지도를 표시할 div
+    mapOption = {
+      center: new kakao.maps.LatLng(35.1738137, 129.128936), // 지도의 중심좌표
+      level: 7 // 지도의 확대 레벨
+    };
+
+  // 지도를 표시할 div와  지도 옵션으로  지도를 생성합니다
+  const map = new kakao.maps.Map(mapContainer, mapOption);
+</script>
+
+<script>
+
+  const renderStore = (store) => {
+    let str = ''
+
+    const {sno, sname, lat, lng, menu} = store
+
+    str += `<h1>${sno}</h1>`
+    str += `<h1>${sname}</h1>`
+    str += `<h1>${lat}</h1>`
+    str += `<h1>${lng}</h1>`
+    str += `<h1>${menu}</h1>`
+
+    document.querySelector(".detail").innerHTML = str
+  }
+
+  const renderStores = (stores) => {
+    console.log(stores)
+
+    stores.forEach(store => {
+      // 마커를 생성합니다
+      const marker = new kakao.maps.Marker({
+        position: new kakao.maps.LatLng(store.lat, store.lng)
+      });
+      marker.sno = store.sno
+
+      kakao.maps.event.addListener(marker, 'mouseover', function() {
+        console.log("mouseover..." + marker.sno)
+        storeService.fetchStore(marker.sno)
+      });
+      // 마커에 마우스아웃 이벤트를 등록합니다
+      kakao.maps.event.addListener(marker, 'mouseout', function() {
+        console.log("mouseout..........")
+      });
+      marker.setMap(map)
+    })
+
+    let str = ''
+    stores.forEach(store => {
+
+      str += `<li>${store.sname}</li>`
+
+    })
+
+    document.querySelector(".stores ul").innerHTML = str
+
+
+  }
+
+  const storeService = (() => {
+
+    let arr = null
+
+
+
+    const fetchStores =  async () => {
+
+      const {data} = await  axios.get('stores.json')
+      arr = data
+
+      renderStores(data)
+
+    }
+
+    const fetchStore = (sno) => {
+
+      //bad code
+      const targetStore =  arr.find(ele => ele.sno == sno)
+      console.log(targetStore)
+      renderStore(targetStore)
+
+    }
+
+    return {fetchStores, fetchStore}
+
+  })()
+
+  storeService.fetchStores()
+
+</script>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
